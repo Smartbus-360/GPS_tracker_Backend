@@ -19,10 +19,13 @@ app.use("/api/drivers", driverRoutes);
 app.use("/api/stops", stopRoutes);
 
 
+// 🔍 Debug: list all registered routes safely
 app._router.stack.forEach(r => {
   if (r.route && r.route.path) {
+    // Direct route
     console.log("Route:", r.route.path);
-  } else if (r.name === "router") {
+  } else if (r.name === "router" && r.handle && r.handle.stack) {
+    // Router with subroutes
     r.handle.stack.forEach(handler => {
       if (handler.route) {
         console.log("Subroute:", handler.route.path);
@@ -30,6 +33,7 @@ app._router.stack.forEach(r => {
     });
   }
 });
+
 
 
 app.listen(5000, () => console.log("🚀 Server running on port 5000"));
