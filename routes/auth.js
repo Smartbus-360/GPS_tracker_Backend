@@ -35,6 +35,8 @@ const router = express.Router();
 const JWT_SECRET = "supersecret";
 
 router.post("/login", async (req, res) => {
+    console.log("Incoming body:", req.body);   // 👈 add this line
+
   try {
     // ✅ Prevent crash if req.body is missing
     const { username, password } = req.body || {};
