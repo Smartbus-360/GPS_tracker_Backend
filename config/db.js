@@ -1,8 +1,8 @@
 import mysql from "mysql2/promise";
 
-export const db = mysql.createPool({
+export const db = await mysql.createPool({
   host: "localhost",
-  user: "gpsuser",
-  password: "Gps@2025Secure!",
+  user: "root",
+  password: "",
   database: "tracking_db"
 });
