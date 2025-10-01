@@ -18,4 +18,18 @@ app.use("/api/schooladmins", schoolAdminRoutes);
 app.use("/api/drivers", driverRoutes);
 app.use("/api/stops", stopRoutes);
 
+
+app._router.stack.forEach(r => {
+  if (r.route && r.route.path) {
+    console.log("Route:", r.route.path);
+  } else if (r.name === "router") {
+    r.handle.stack.forEach(handler => {
+      if (handler.route) {
+        console.log("Subroute:", handler.route.path);
+      }
+    });
+  }
+});
+
+
 app.listen(5000, () => console.log("🚀 Server running on port 5000"));
