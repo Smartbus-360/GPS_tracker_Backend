@@ -21,18 +21,21 @@ app.use("/api/stops", stopRoutes);
 
 // 🔍 Debug: list all registered routes safely
 app._router.stack.forEach(r => {
-  if (r.route && r.route.path) {
-    // Direct route
-    console.log("Route:", r.route.path);
-  } else if (r.name === "router" && r.handle && r.handle.stack) {
-    // Router with subroutes
-    r.handle.stack.forEach(handler => {
-      if (handler.route) {
-        console.log("Subroute:", handler.route.path);
-      }
-    });
+  try {
+    if (r.route && r.route.path) {
+      console.log("Route:", r.route.path);
+    } else if (r.name === "router" && r.handle && Array.isArray(r.handle.stack)) {
+      r.handle.stack.forEach(handler => {
+        if (handler.route) {
+          console.log("Subroute:", handler.route.path);
+        }
+      });
+    }
+  } catch (err) {
+    console.log("Skipping a middleware layer");
   }
 });
+
 
 
 
