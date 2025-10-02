@@ -67,7 +67,7 @@ router.get("/school", authMiddleware(["schooladmin"]), async (req, res) => {
 
   try {
     const [rows] = await db.query(
-      `SELECT rs.id, rs.round_name, rs.stop_order, rs.latitude, rs.longitude,rs.placename
+      `SELECT rs.id, rs.round_name, rs.stop_order, rs.latitude, rs.longitude,rs.placename,
               d.name AS driver_name, s.name AS school_name, rs.created_at
        FROM round_stops rs
        JOIN drivers d ON rs.driver_id = d.id
@@ -87,7 +87,7 @@ router.get("/school", authMiddleware(["schooladmin"]), async (req, res) => {
 router.get("/all", authMiddleware(["superadmin"]), async (req, res) => {
   try {
     const [rows] = await db.query(
-      `SELECT rs.id, rs.round_name, rs.stop_order, rs.latitude, rs.longitude,
+      `SELECT rs.id, rs.round_name, rs.stop_order, rs.latitude, rs.longitude,rs.placename,
               d.name AS driver_name, s.name AS school_name, rs.created_at
        FROM round_stops rs
        JOIN drivers d ON rs.driver_id = d.id
@@ -107,7 +107,7 @@ router.get("/export/school", authMiddleware(["schooladmin"]), async (req, res) =
 
   try {
     const [rows] = await db.query(
-      `SELECT rs.round_name, rs.stop_order, rs.latitude, rs.longitude,rs.placename
+      `SELECT rs.round_name, rs.stop_order, rs.latitude, rs.longitude,rs.placename,
               d.name AS driver_name, s.name AS school_name, rs.created_at
        FROM round_stops rs
        JOIN drivers d ON rs.driver_id = d.id
@@ -135,7 +135,7 @@ router.get("/export/school", authMiddleware(["schooladmin"]), async (req, res) =
 router.get("/export/all", authMiddleware(["superadmin"]), async (req, res) => {
   try {
     const [rows] = await db.query(
-      `SELECT rs.round_name, rs.stop_order, rs.latitude, rs.longitude,rs.placename
+      `SELECT rs.round_name, rs.stop_order, rs.latitude, rs.longitude,rs.placename,
               d.name AS driver_name, s.name AS school_name, rs.created_at
        FROM round_stops rs
        JOIN drivers d ON rs.driver_id = d.id
