@@ -48,7 +48,7 @@ router.post("/save_round", authMiddleware(["driver"]), async (req, res) => {
     // 2. Insert stops using driver_id
     for (const stop of stops) {
       await db.query(
-        "INSERT INTO round_stops (driver_id, school_id, round_name, stop_order, latitude, longitude,placename) VALUES (?, ?, ?, ?, ?, ?)",
+        "INSERT INTO round_stops (driver_id, school_id, round_name, stop_order, latitude, longitude,placename) VALUES (?, ?, ?, ?, ?, ?,?)",
         [driver_id, school_id, round_name, stop.order, stop.latitude, stop.longitude,stop.placename]
       );
     }
