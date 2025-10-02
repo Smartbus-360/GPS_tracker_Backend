@@ -30,6 +30,8 @@ const router = express.Router();
 // });
 router.post("/save_round", authMiddleware(["driver"]), async (req, res) => {
   const { round_name, stops } = req.body;
+  console.log("Incoming round:", round_name);
+  console.log("Incoming stops:", JSON.stringify(stops, null, 2));  // 👈 add this
   const user_id = req.user.id;        // this is users.id
   const school_id = req.user.school_id;
 
