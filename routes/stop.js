@@ -48,8 +48,8 @@ router.post("/save_round", authMiddleware(["driver"]), async (req, res) => {
     // 2. Insert stops using driver_id
     for (const stop of stops) {
       await db.query(
-        "INSERT INTO round_stops (driver_id, school_id, round_name, stop_order, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?)",
-        [driver_id, school_id, round_name, stop.order, stop.latitude, stop.longitude]
+        "INSERT INTO round_stops (driver_id, school_id, round_name, stop_order, latitude, longitude,placename) VALUES (?, ?, ?, ?, ?, ?)",
+        [driver_id, school_id, round_name, stop.order, stop.latitude, stop.longitude,stop.placename]
       );
     }
 
@@ -67,7 +67,7 @@ router.get("/school", authMiddleware(["schooladmin"]), async (req, res) => {
 
   try {
     const [rows] = await db.query(
-      `SELECT rs.id, rs.round_name, rs.stop_order, rs.latitude, rs.longitude,
+      `SELECT rs.id, rs.round_name, rs.stop_order, rs.latitude, rs.longitude,rs.placename
               d.name AS driver_name, s.name AS school_name, rs.created_at
        FROM round_stops rs
        JOIN drivers d ON rs.driver_id = d.id
@@ -107,7 +107,7 @@ router.get("/export/school", authMiddleware(["schooladmin"]), async (req, res) =
 
   try {
     const [rows] = await db.query(
-      `SELECT rs.round_name, rs.stop_order, rs.latitude, rs.longitude,
+      `SELECT rs.round_name, rs.stop_order, rs.latitude, rs.longitude,rs.placename
               d.name AS driver_name, s.name AS school_name, rs.created_at
        FROM round_stops rs
        JOIN drivers d ON rs.driver_id = d.id
@@ -135,7 +135,7 @@ router.get("/export/school", authMiddleware(["schooladmin"]), async (req, res) =
 router.get("/export/all", authMiddleware(["superadmin"]), async (req, res) => {
   try {
     const [rows] = await db.query(
-      `SELECT rs.round_name, rs.stop_order, rs.latitude, rs.longitude,
+      `SELECT rs.round_name, rs.stop_order, rs.latitude, rs.longitude,rs.placename
               d.name AS driver_name, s.name AS school_name, rs.created_at
        FROM round_stops rs
        JOIN drivers d ON rs.driver_id = d.id
