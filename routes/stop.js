@@ -134,6 +134,59 @@ router.get("/export/school", authMiddleware(["schooladmin"]), async (req, res) =
   }
 });
 
+// Export stops filtered by driver id and/or driver name
+router.get("/export/filter", authMiddleware(["superadmin","schooladmin"]), async (req, res) => {
+  const { driver_id, driver_name } = req.query;
+  const role = req.user.role;
+  const school_id = req.user.school_id;
+
+  try {
+    let query = `
+      SELECT rs.round_name, rs.stop_order, rs.latitude, rs.longitude, rs.placename,
+             d.name AS driver_name, s.name AS school_name, rs.created_at
+      FROM round_stops rs
+      JOIN drivers d ON rs.driver_id = d.id
+      JOIN schools s ON rs.school_id = s.id
+      WHERE 1=1
+    `;
+    const params = [];
+
+    if (driver_id) {
+      query += " AND rs.driver_id = ?";
+      params.push(driver_id);
+    }
+
+    if (driver_name) {
+      query += " AND d.name LIKE ?";
+      params.push(`%${driver_name}%`);
+    }
+
+    if (role === "schooladmin") {
+      query += " AND rs.school_id = ?";
+      params.push(school_id);
+    }
+
+    query += " ORDER BY rs.round_name, rs.stop_order ASC";
+
+    const [rows] = await db.query(query, params);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "No stops found" });
+    }
+
+    const parser = new Parser();
+    const csv = parser.parse(rows);
+
+    res.header("Content-Type", "text/csv");
+    res.attachment("filtered_stops.csv");
+    return res.send(csv);
+  } catch (err) {
+    console.error("Error exporting filtered stops:", err);
+    res.status(500).json({ message: "Error exporting filtered stops" });
+  }
+});
+
+
 // Superadmin export all stops to CSV
 router.get("/export/all", authMiddleware(["superadmin"]), async (req, res) => {
   try {
