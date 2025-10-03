@@ -103,6 +103,28 @@ router.delete("/:id", authMiddleware(["schooladmin"]), async (req, res) => {
   }
 });
 
+// Fetch stops by driver id
+router.get("/by-driver/:driverId", authMiddleware(["schooladmin","superadmin"]), async (req, res) => {
+  const { driverId } = req.params;
+
+  try {
+    const [rows] = await db.query(
+      `SELECT rs.id, rs.round_name, rs.stop_order, rs.latitude, rs.longitude, rs.placename,
+              d.name AS driver_name, s.name AS school_name, rs.created_at
+       FROM round_stops rs
+       JOIN drivers d ON rs.driver_id = d.id
+       JOIN schools s ON rs.school_id = s.id
+       WHERE rs.driver_id = ?
+       ORDER BY rs.round_name, rs.stop_order ASC`,
+      [driverId]
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching stops by driver" });
+  }
+});
+
 // routes/driver.js
 router.get("/all", authMiddleware(["superadmin"]), async (req, res) => {
   try {
