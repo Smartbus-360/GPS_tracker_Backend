@@ -65,44 +65,125 @@ router.post("/save_round", authMiddleware(["driver"]), async (req, res) => {
 
 
 // School admin fetches stops
+// router.get("/school", authMiddleware(["schooladmin"]), async (req, res) => {
+//   const school_id = req.user.school_id;
+
+//   try {
+//     const [rows] = await db.query(
+//       `SELECT rs.id, rs.round_name, rs.stop_order, rs.latitude, rs.longitude,rs.placename,
+//               d.name AS driver_name, s.name AS school_name, rs.created_at
+//        FROM round_stops rs
+//        JOIN drivers d ON rs.driver_id = d.id
+//        JOIN schools s ON rs.school_id = s.id
+//        WHERE rs.school_id = ?
+//        ORDER BY rs.round_name, rs.stop_order ASC`,
+//       [school_id]
+//     );
+//     res.json(rows);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: "Error fetching stops" });
+//   }
+// });
+// School admin fetches stops (with filters)
 router.get("/school", authMiddleware(["schooladmin"]), async (req, res) => {
   const school_id = req.user.school_id;
+  const { round, driver_id, driver_name } = req.query; // ✅ accept filters
 
   try {
-    const [rows] = await db.query(
-      `SELECT rs.id, rs.round_name, rs.stop_order, rs.latitude, rs.longitude,rs.placename,
-              d.name AS driver_name, s.name AS school_name, rs.created_at
-       FROM round_stops rs
-       JOIN drivers d ON rs.driver_id = d.id
-       JOIN schools s ON rs.school_id = s.id
-       WHERE rs.school_id = ?
-       ORDER BY rs.round_name, rs.stop_order ASC`,
-      [school_id]
-    );
+    let query = `
+      SELECT rs.id, rs.round_name, rs.stop_order, rs.latitude, rs.longitude, rs.placename,
+             d.name AS driver_name, s.name AS school_name, rs.created_at
+      FROM round_stops rs
+      JOIN drivers d ON rs.driver_id = d.id
+      JOIN schools s ON rs.school_id = s.id
+      WHERE rs.school_id = ?
+    `;
+    const params = [school_id];
+
+    if (round) {
+      query += " AND rs.round_name = ?";
+      params.push(round);
+    }
+
+    if (driver_id) {
+      query += " AND rs.driver_id = ?";
+      params.push(driver_id);
+    }
+
+    if (driver_name) {
+      query += " AND d.name LIKE ?";
+      params.push(`%${driver_name}%`);
+    }
+
+    query += " ORDER BY rs.round_name, rs.stop_order ASC";
+
+    const [rows] = await db.query(query, params);
     res.json(rows);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Error fetching stops" });
   }
 });
+
 
 // Superadmin fetches all stops
+// router.get("/all", authMiddleware(["superadmin"]), async (req, res) => {
+//   try {
+//     const [rows] = await db.query(
+//       `SELECT rs.id, rs.round_name, rs.stop_order, rs.latitude, rs.longitude,rs.placename,
+//               d.name AS driver_name, s.name AS school_name, rs.created_at
+//        FROM round_stops rs
+//        JOIN drivers d ON rs.driver_id = d.id
+//        JOIN schools s ON rs.school_id = s.id
+//        ORDER BY s.name, rs.round_name, rs.stop_order ASC`
+//     );
+//     res.json(rows);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: "Error fetching stops" });
+//   }
+// });
+// Superadmin fetches all stops (with filters)
 router.get("/all", authMiddleware(["superadmin"]), async (req, res) => {
+  const { round, driver_id, driver_name } = req.query; // ✅ accept filters
+
   try {
-    const [rows] = await db.query(
-      `SELECT rs.id, rs.round_name, rs.stop_order, rs.latitude, rs.longitude,rs.placename,
-              d.name AS driver_name, s.name AS school_name, rs.created_at
-       FROM round_stops rs
-       JOIN drivers d ON rs.driver_id = d.id
-       JOIN schools s ON rs.school_id = s.id
-       ORDER BY s.name, rs.round_name, rs.stop_order ASC`
-    );
+    let query = `
+      SELECT rs.id, rs.round_name, rs.stop_order, rs.latitude, rs.longitude, rs.placename,
+             d.name AS driver_name, s.name AS school_name, rs.created_at
+      FROM round_stops rs
+      JOIN drivers d ON rs.driver_id = d.id
+      JOIN schools s ON rs.school_id = s.id
+      WHERE 1=1
+    `;
+    const params = [];
+
+    if (round) {
+      query += " AND rs.round_name = ?";
+      params.push(round);
+    }
+
+    if (driver_id) {
+      query += " AND rs.driver_id = ?";
+      params.push(driver_id);
+    }
+
+    if (driver_name) {
+      query += " AND d.name LIKE ?";
+      params.push(`%${driver_name}%`);
+    }
+
+    query += " ORDER BY s.name, rs.round_name, rs.stop_order ASC";
+
+    const [rows] = await db.query(query, params);
     res.json(rows);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Error fetching stops" });
   }
 });
+
 
 // School admin export stops to CSV
 router.get("/export/school", authMiddleware(["schooladmin"]), async (req, res) => {
