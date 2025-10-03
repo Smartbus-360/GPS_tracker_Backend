@@ -103,4 +103,22 @@ router.delete("/:id", authMiddleware(["schooladmin"]), async (req, res) => {
   }
 });
 
+// routes/driver.js
+router.get("/all", authMiddleware(["superadmin"]), async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT d.id, d.name, u.username, u.role, s.name AS school_name, d.created_at
+      FROM drivers d
+      JOIN users u ON d.user_id = u.id
+      JOIN schools s ON d.school_id = s.id
+      ORDER BY d.id DESC
+    `);
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching all drivers" });
+  }
+});
+
+
 export default router;
