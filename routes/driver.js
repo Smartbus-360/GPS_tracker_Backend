@@ -226,7 +226,7 @@ router.get("/:id/stops", authMiddleware(["superadmin","schooladmin"]), async (re
 router.get("/all", authMiddleware(["superadmin"]), async (req, res) => {
   try {
     const [rows] = await db.query(`
-      SELECT d.id, d.name, u.username, u.role, s.name AS school_name, d.created_at
+      SELECT d.id, d.name, u.username, u.role, s.name AS school_name, u.created_at
       FROM drivers d
       JOIN users u ON d.user_id = u.id
       JOIN schools s ON d.school_id = s.id
