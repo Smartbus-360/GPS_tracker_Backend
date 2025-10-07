@@ -153,6 +153,7 @@ router.get("/school", authMiddleware(["schooladmin"]), async (req, res) => {
 // });
 // Superadmin fetches all stops (with filters)
 router.get("/all", authMiddleware(["superadmin"]), async (req, res) => {
+  console.log("Filters received:", req.query);
   const { round, driver_id, driver_name } = req.query; // ✅ accept filters
 
   try {
@@ -162,7 +163,9 @@ router.get("/all", authMiddleware(["superadmin"]), async (req, res) => {
       FROM round_stops rs
       JOIN drivers d ON rs.driver_id = d.id
       JOIN schools s ON rs.school_id = s.id
-      WHERE 1=1
+      // WHERE 1=1
+      WHERE rs.id IS NOT NULL
+
     `;
     const params = [];
 
@@ -276,6 +279,7 @@ router.get("/export/school", authMiddleware(["schooladmin"]), async (req, res) =
 
 // Export stops filtered by round, driver id and/or driver name
 router.get("/export/filter", authMiddleware(["superadmin","schooladmin"]), async (req, res) => {
+  console.log("Export filters received:", req.query);
   const { round, driver_id, driver_name } = req.query;
   const role = req.user.role;
   const school_id = req.user.school_id;
