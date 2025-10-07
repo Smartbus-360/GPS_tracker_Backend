@@ -38,7 +38,7 @@ router.get("/", authMiddleware(["schooladmin"]), async (req, res) => {
 
   try {
     const [rows] = await db.query(
-      `SELECT d.id, d.name, u.username, u.role, d.created_at
+      `SELECT d.id, d.name, u.username, u.role, u.created_at
        FROM drivers d
        JOIN users u ON d.user_id = u.id
        WHERE d.school_id = ?`,
