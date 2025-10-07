@@ -285,13 +285,21 @@ router.get("/export/filter", authMiddleware(["superadmin","schooladmin"]), async
 
   try {
     let query = `
-      SELECT rs.round_name, rs.stop_order, rs.latitude, rs.longitude, rs.placename,
-             d.name AS driver_name, s.name AS school_name, rs.created_at
-      FROM round_stops rs
-      JOIN drivers d ON rs.driver_id = d.id
-      JOIN schools s ON rs.school_id = s.id
-      WHERE 1=1
-    `;
+  SELECT 
+    rs.round_name AS Round_Name,
+    rs.placename AS Place_Name,
+    rs.stop_order AS Stop_Order,
+    rs.latitude AS Latitude,
+    rs.longitude AS Longitude,
+    d.name AS Driver_Name,
+    s.name AS School_Name,
+    rs.created_at AS Created_At
+  FROM round_stops rs
+  JOIN drivers d ON rs.driver_id = d.id
+  JOIN schools s ON rs.school_id = s.id
+  WHERE 1=1
+`;
+
     const params = [];
 
     if (round) {
