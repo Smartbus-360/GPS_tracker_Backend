@@ -33,23 +33,23 @@ router.post("/", authMiddleware(["schooladmin"]), async (req, res) => {
 });
 
 // Get all drivers for logged-in school admin
-// router.get("/", authMiddleware(["schooladmin"]), async (req, res) => {
-//   const school_id = req.user.school_id;
+router.get("/", authMiddleware(["schooladmin"]), async (req, res) => {
+  const school_id = req.user.school_id;
 
-//   try {
-//     const [rows] = await db.query(
-//       `SELECT d.id, d.name, u.username, u.role, d.created_at
-//        FROM drivers d
-//        JOIN users u ON d.user_id = u.id
-//        WHERE d.school_id = ?`,
-//       [school_id]
-//     );
-//     res.json(rows);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ message: "Error fetching drivers" });
-//   }
-// });
+  try {
+    const [rows] = await db.query(
+      `SELECT d.id, d.name, u.username, u.role, d.created_at
+       FROM drivers d
+       JOIN users u ON d.user_id = u.id
+       WHERE d.school_id = ?`,
+      [school_id]
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching drivers" });
+  }
+});
 
 // ✅ Get all drivers (superadmin = all drivers, schooladmin = only their school's drivers)
 router.get("/", authMiddleware(["superadmin", "schooladmin"]), async (req, res) => {
@@ -223,21 +223,21 @@ router.get("/:id/stops", authMiddleware(["superadmin","schooladmin"]), async (re
 });
 
 // routes/driver.js
-// router.get("/all", authMiddleware(["superadmin"]), async (req, res) => {
-//   try {
-//     const [rows] = await db.query(`
-//       SELECT d.id, d.name, u.username, u.role, s.name AS school_name, d.created_at
-//       FROM drivers d
-//       JOIN users u ON d.user_id = u.id
-//       JOIN schools s ON d.school_id = s.id
-//       ORDER BY d.id DESC
-//     `);
-//     res.json(rows);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ message: "Error fetching all drivers" });
-//   }
-// });
+router.get("/all", authMiddleware(["superadmin"]), async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT d.id, d.name, u.username, u.role, s.name AS school_name, d.created_at
+      FROM drivers d
+      JOIN users u ON d.user_id = u.id
+      JOIN schools s ON d.school_id = s.id
+      ORDER BY d.id DESC
+    `);
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching all drivers" });
+  }
+});
 
 
 export default router;
