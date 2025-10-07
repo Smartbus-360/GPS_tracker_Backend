@@ -59,7 +59,7 @@ router.get("/", authMiddleware(["superadmin", "schooladmin"]), async (req, res) 
 
   try {
     let query = `
-      SELECT d.id, d.name, u.username, u.role, s.name AS school_name, d.created_at
+      SELECT d.id, d.name, u.username, u.role, s.name AS school_name
       FROM drivers d
       JOIN users u ON d.user_id = u.id
       JOIN schools s ON d.school_id = s.id
