@@ -163,7 +163,6 @@ router.get("/all", authMiddleware(["superadmin"]), async (req, res) => {
       FROM round_stops rs
       JOIN drivers d ON rs.driver_id = d.id
       JOIN schools s ON rs.school_id = s.id
-      // WHERE 1=1
       WHERE rs.id IS NOT NULL
 
     `;
