@@ -38,7 +38,7 @@ router.get("/", authMiddleware(["schooladmin"]), async (req, res) => {
 
   try {
     const [rows] = await db.query(
-      `SELECT d.id, d.name, u.username, u.role, u.created_at
+      `SELECT d.id, d.name, u.username, u.role
        FROM drivers d
        JOIN users u ON d.user_id = u.id
        WHERE d.school_id = ?`,
@@ -58,7 +58,7 @@ router.get("/", authMiddleware(["superadmin", "schooladmin"]), async (req, res) 
 
   try {
     let query = `
-      SELECT d.id, d.name, u.username, u.role, s.name AS school_name, d.created_at
+      SELECT d.id, d.name, u.username, u.role, s.name AS school_name
       FROM drivers d
       JOIN users u ON d.user_id = u.id
       JOIN schools s ON d.school_id = s.id
@@ -164,7 +164,7 @@ router.get("/:id", authMiddleware(["superadmin","schooladmin"]), async (req, res
 
   try {
     let query = `
-      SELECT d.id, d.name, u.username, u.role, s.name AS school_name, d.created_at
+      SELECT d.id, d.name, u.username, u.role, s.name AS school_name
       FROM drivers d
       JOIN users u ON d.user_id = u.id
       JOIN schools s ON d.school_id = s.id
@@ -226,7 +226,7 @@ router.get("/:id/stops", authMiddleware(["superadmin","schooladmin"]), async (re
 router.get("/all", authMiddleware(["superadmin"]), async (req, res) => {
   try {
     const [rows] = await db.query(`
-      SELECT d.id, d.name, u.username, u.role, s.name AS school_name, u.created_at
+      SELECT d.id, d.name, u.username, u.role, s.name AS school_name
       FROM drivers d
       JOIN users u ON d.user_id = u.id
       JOIN schools s ON d.school_id = s.id
