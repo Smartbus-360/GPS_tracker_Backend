@@ -41,6 +41,65 @@ router.get("/", authMiddleware(["superadmin"]), async (req, res) => {
   }
 });
 
+// Delete a school admin (Superadmin only)
+router.delete("/:id", authMiddleware(["superadmin"]), async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [result] = await db.query(
+      "DELETE FROM users WHERE id = ? AND role = 'schooladmin'",
+      [id]
+    );
+    if (result.affectedRows === 0)
+      return res.status(404).json({ message: "School admin not found" });
+
+    res.json({ success: true, message: "School admin deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error deleting school admin" });
+  }
+});
+
+// Update a school admin (Superadmin only)
+router.put("/:id", authMiddleware(["superadmin"]), async (req, res) => {
+  const { id } = req.params;
+  const { username, password, school_id } = req.body;
+
+  try {
+    // Build dynamic update query
+    let query = "UPDATE users SET ";
+    const params = [];
+    if (username) {
+      query += "username = ?, ";
+      params.push(username);
+    }
+    if (password) {
+      const hashed = await bcrypt.hash(password, 10);
+      query += "password = ?, ";
+      params.push(hashed);
+    }
+    if (school_id) {
+      query += "school_id = ?, ";
+      params.push(school_id);
+    }
+
+    // Remove last comma
+    query = query.slice(0, -2);
+    query += " WHERE id = ? AND role = 'schooladmin'";
+    params.push(id);
+
+    const [result] = await db.query(query, params);
+
+    if (result.affectedRows === 0)
+      return res.status(404).json({ message: "School admin not found" });
+
+    res.json({ success: true, message: "School admin updated successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error updating school admin" });
+  }
+});
+
+
 router.get("/export/school", authMiddleware(["schooladmin"]), async (req, res) => {
   const school_id = req.user.school_id;
   const { round, driver_id } = req.query; // ✅ filters
